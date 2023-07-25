@@ -1,0 +1,72 @@
+
+<link rel="stylesheet" type="text/css" href="index.css"  />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<div id="site">
+    <div class="app">
+        <div id="main" v-if="main">
+            <div class="logo">
+                <h1>📔 Meus  Contatos</h1>
+                <i id="add"   v-on:click="main=!main"  class="fa fa-duotone fa-user-plus" style="color:white;font-size:30px;position: absolute;top: 25;right: 7%;"></i>
+                <i id="exclude"  v-on:click="excludeMode = !excludeMode" class="fa fa-solid fa-trash" style="color:white;font-size:30px;position: absolute;top: 25;right: 3%;"></i>
+            </div>
+            <ul class="contato">
+                <li v-for="item in ctts" :key="item._id">
+                    <div class="contactInfo">
+                            <img width="5%" height="10%" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+                            <p>Nome:{{ item.name }}</p>
+                            <p>Numero:{{ item.numero }}</p>
+                            <i v-if="excludeMode" v-on:click="exclude(item.name)" id="excludes" class="fa fa-solid fa-trash" style="color:rgb(255, 0, 0);font-size:30px;position:absolute;right: 0%;"></i>
+                        </div>
+                    <br>
+                </li>
+            </ul>
+        </div>
+        <div id="main" v-if="main===false">
+            <div class="logo">
+                <h1>Adicionar Contato</h1>
+                <i id="add"   v-on:click="main=!main"  class="fa fa-duotone fa-address-book" style="color:white;font-size:30px;position: absolute;top: 25;right: 7%;"></i>
+                <!-- <i id="exclude"  v-on:click="excludeMode = !excludeMode" class="fa fa-solid fa-trash" style="color:white;font-size:30px;position: absolute;top: 25;right: 3%;"></i> -->
+            </div>
+            <div class="form__group">
+                <input type="text"   class="form__input" id="name" placeholder="Nome" required="" />
+                <input style="margin-top: 5%;" type="number" class="form__input" id="number" placeholder="Numero" required="" />
+                <input v-on:click="add_usr" style="margin-top: 5%;" value="adicionar" type="submit" class="form__input" id="number" placeholder="Numero" required="" />
+              </div>
+              
+        </div>
+    </div>
+</div>
+<script>
+    Vue.config.devtools = true
+    new Vue({
+        el: "#site",
+        data:{
+            ctts:[],
+            main:true,
+            excludeMode:false
+        },
+        methods:{
+            exclude:function(e) {
+                axios.get('/delete?usr='+e).then(x => {
+                   window.alert("ok")
+                   axios.get('/contatos').then(response => this.ctts = response.data) 
+                })
+            },
+            add_usr:function(){
+                usr = document.getElementById("name").value
+                num = document.getElementById("number").value
+                console.log(usr,num)
+                axios.get('/add?usr='+usr+"&num="+num).then(x => {
+                   window.alert("ok")
+                   axios.get('/contatos').then(response => this.ctts = response.data) 
+                })
+            }
+        },
+        mounted () {
+            axios.get('/contatos').then(response => (this.ctts = response.data))
+  }  
+    })
+</script>
